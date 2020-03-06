@@ -1,0 +1,10 @@
+{
+  "manifest_version": 2,
+  "name": "Mirror cookies",
+  "description": "Copy all the cookies from a given domain to another, only changing the \"domain\" property.",
+  "version": "1.0",
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["storage", "cookies", "<all_urls>"]
+}

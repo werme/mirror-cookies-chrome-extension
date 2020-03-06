@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Mirror cookies</title>
+  <script src="main.js"></script>
+</head>
+
+<style>
+  * { box-sizing: border-box; }
+  html {
+    font-size: 0.625em;
+  }
+  body {
+    width: 28rem;
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  input, button {
+    display: block;
+    width: 100%;
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    border-radius: 2px;
+    outline: none;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  button {
+    text-align: left;
+    cursor: pointer;
+  }
+  input {
+    background: #f7f7f6;
+  }
+  button[disabled] { opacity: 0.5; cursor: default; }
+  .row {
+    display: flex;
+    margin-left: -0.5rem;
+  }
+  .row > * { margin-left: 0.5rem; }
+  #content-container > *:first-child { margin-top: 1rem; }
+  #content-container button {
+    border: 0;
+    padding: 0
+  }
+  #content-container button.is-selected:before {
+    content: '\2713';
+    margin-right: 0.2rem;
+  }
+  #sync-button {
+    text-align: center;
+    background: #d3e7ff;
+    color: #1e6de2;
+    border: 0;
+    margin-top: 1rem;
+  }
+</style>
+
+<body>
+  <div class="row" style="align-items: center;">
+    <input required autofocus id="origin-input" placeholder="Origin" />
+    <div>&RightArrow;</div>
+    <input required id="target-input" placeholder="Target" />
+  </div>
+  <div id="content-container"></div>
+  <button id="sync-button">kry</button>
+</body>
+
+</html>
