@@ -6,7 +6,7 @@ function appendHtml(parent, html) {
 
 const omit = (object, properties) =>
   Object.keys(object)
-    .filter(key => !properties.includes(key))
+    .filter((key) => !properties.includes(key))
     .reduce((filteredObject, key) => {
       filteredObject[key] = object[key];
       return filteredObject;
@@ -14,24 +14,28 @@ const omit = (object, properties) =>
 
 const syncCookies = ({ names, originDomain, targetDomain }, callback) => {
   try {
-    chrome.cookies.getAll({}, cookies => {
+    chrome.cookies.getAll({}, (cookies) => {
       const cookiesToSync = cookies.filter(
-        cookie => cookie.domain === originDomain && names.includes(cookie.name)
+        (cookie) =>
+          cookie.domain === originDomain && names.includes(cookie.name)
       );
 
       let doneCount = 0;
 
-      cookiesToSync.forEach(cookie => {
+      cookiesToSync.forEach((cookie) => {
         try {
           const newCookie = Object.assign(
             {},
             omit(cookie, ["hostOnly", "session"]),
             {
-              url: "https://" + targetDomain,
-              domain: targetDomain
+              url:
+                (targetDomain === "localhost" ? "http://" : "https://") +
+                targetDomain,
+              domain: targetDomain,
+              secure: targetDomain !== "localhost",
             }
           );
-          chrome.cookies.set(newCookie, written => {
+          chrome.cookies.set(newCookie, (written) => {
             if (written) return;
             callback(new Error(JSON.stringify(newCookie, null, 2)));
             callback(chrome.runtime.lastError);
@@ -65,10 +69,10 @@ document.addEventListener(
     const button = document.getElementById("sync-button");
     const container = document.getElementById("content-container");
 
-    const alert = message =>
+    const alert = (message) =>
       appendHtml(container, `<div>${JSON.stringify(message, null, 2)}</div>`);
 
-    const reloadOriginCookies = domain => {
+    const reloadOriginCookies = (domain) => {
       const updateButton = ({ cookies, selectedCookieNames } = {}) => {
         const canSubmit =
           cookies.length !== 0 && selectedCookieNames.length !== 0;
@@ -80,13 +84,13 @@ document.addEventListener(
           : "Select the cookies you want to sync";
       };
 
-      chrome.cookies.getAll({}, cookies => {
+      chrome.cookies.getAll({}, (cookies) => {
         container.innerHTML = "";
         const originCookies = cookies.filter(
-          cookie => cookie.domain === domain
+          (cookie) => cookie.domain === domain
         );
 
-        originCookies.forEach(cookie => {
+        originCookies.forEach((cookie) => {
           const el = document.createElement("button");
           el.textContent = cookie.name;
           el.classList.toggle(
@@ -96,7 +100,7 @@ document.addEventListener(
 
           el.addEventListener("click", () => {
             selectedCookieNames = selectedCookieNames.includes(cookie.name)
-              ? selectedCookieNames.filter(n => n !== cookie.name)
+              ? selectedCookieNames.filter((n) => n !== cookie.name)
               : [...selectedCookieNames, cookie.name];
             el.classList.toggle(
               "is-selected",
@@ -127,7 +131,7 @@ document.addEventListener(
             {
               "origin-domain": originInput.value,
               "target-domain": targetInput.value,
-              "cookie-names": selectedCookieNames.join(",")
+              "cookie-names": selectedCookieNames.join(","),
             },
             () => {
               if (!chrome.runtime.lastError) return;
@@ -139,16 +143,15 @@ document.addEventListener(
             {
               names: selectedCookieNames,
               originDomain: originInput.value,
-              targetDomain: targetInput.value
+              targetDomain: targetInput.value,
             },
-            error => {
+            (error) => {
               if (error) {
                 alert(`Error: ${error.message}`);
                 button.innerHTML = "Error syncing cookies!";
                 return;
               }
               button.innerHTML = "Cookies synced!";
-              // window.setTimeout(window.close, 1500);
             }
           );
         } catch (e) {
@@ -161,7 +164,7 @@ document.addEventListener(
     try {
       chrome.storage.sync.get(
         ["origin-domain", "target-domain", "cookie-names"],
-        payload => {
+        (payload) => {
           originInput.value = payload["origin-domain"] || "";
           targetInput.value = payload["target-domain"] || "";
           selectedCookieNames = payload["cookie-names"]
